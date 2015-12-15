@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database package="cron" name="curry" defaultIdMethod="native">
+
+	<table name="cron_job">
+		<column name="cron_job_id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true" />
+		<!-- the fully qualified class name of the module -->
+		<column name="job_class" type="VARCHAR" size="256" required="true" />
+		<column name="job_handler" type="VARCHAR" size="256" required="true" defaultValue="handleCronJob" />
+		<column name="module_view" type="VARCHAR" size="256" />
+		<column name="data" type="BLOB" />
+		<!-- whether the cron job is active or temporarily deactivated? -->
+		<column name="active" type="BOOLEAN" defaultValue="true" />
+		
+		<unique>
+			<unique-column name="job_class" size="127" />
+			<unique-column name="job_handler" size="127" />
+		</unique>
+	</table>
+	
+	<table name="cron_job_schedule">
+		<column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="false" />
+		<foreign-key foreignTable="cron_job" onDelete="cascade" onUpdate="cascade">
+			<reference local="id" foreign="cron_job_id" />
+		</foreign-key>
+		
+		<column name="minute" type="VARCHAR" size="255" required="true" defaultValue="*" />
+		<column name="hour" type="VARCHAR" size="255" required="true" defaultValue="*" />
+		<column name="day" type="VARCHAR" size="255" required="true" defaultValue="*" />
+		<column name="month" type="VARCHAR" size="255" required="true" defaultValue="*" />
+		<column name="week_day" type="VARCHAR" size="255" required="true" defaultValue="*" />
+		<column name="year" type="VARCHAR" size="255" required="true" defaultValue="*" />
+	</table>
+	
+</database>
