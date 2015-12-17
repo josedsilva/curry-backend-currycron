@@ -29,23 +29,32 @@ class CronJob extends BaseCronJob
         return (string) $this;
     }
     
-    public function getData()
+    /**
+     * Similar to $this->getData()
+     * but attempts to unserialize the stored value.
+     * NOTE: we do not override the getData() method
+     * because this has negative implications when backing up and restoring
+     * the database with Curry's backup/restore feature.
+     * @return  mixed
+     */
+    public function getParsedData()
     {
-        $resource = parent::getData();
-        if (!is_null($resource)) {
-            try {
-                $content = stream_get_contents($resource, -1, 0);
-                // TODO: close stream?
-                $ret = unserialize($content);
-            } catch (Exception $e) {
-                $ret = $content;
+        $data = parent::getData();
+        if (!is_null($data)) {
+            $ret = @unserialize($data);
+            if ($ret === false) {
+                $ret = $data;
             }
             return $ret;
         }
-        
-        return null;
+        return;
     }
     
+    /**
+     * Serialize an object or array
+     * before storing into the database.
+     * @param mixed $v
+     */
     public function setData($v)
     {
         try {
@@ -125,7 +134,7 @@ class CronJob extends BaseCronJob
     
     private static function fillDataForm(Curry_Form_SubForm $form, CronJob $job)
     {
-        $data = $job->getData();
+        $data = $job->getParsedData();
         if (is_array($data)) {
             foreach ($data as $field => $value) {
                 $form->getElement($field)->setValue($value);

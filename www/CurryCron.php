@@ -136,7 +136,7 @@ class CurryCron
             $jobHandler = $job->getJobHandler();
             $task = new $jobClass;
             try {
-                $task->{$jobHandler}($this->logger, $job->getData());
+                $task->{$jobHandler}($this->logger, $job->getParsedData());
             } catch (Exception $e) {
                 $this->log($e->getErrorMessage(), Logger::ERROR);
             }

@@ -7,7 +7,7 @@
 		<column name="job_class" type="VARCHAR" size="256" required="true" />
 		<column name="job_handler" type="VARCHAR" size="256" required="true" defaultValue="handleCronJob" />
 		<column name="module_view" type="VARCHAR" size="256" />
-		<column name="data" type="BLOB" />
+		<column name="data" type="LONGVARCHAR" />
 		<!-- whether the cron job is active or temporarily deactivated? -->
 		<column name="active" type="BOOLEAN" defaultValue="true" />
 		
