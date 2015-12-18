@@ -10,6 +10,12 @@
 		<column name="data" type="LONGVARCHAR" />
 		<!-- whether the cron job is active or temporarily deactivated? -->
 		<column name="active" type="BOOLEAN" defaultValue="true" />
+		<!--
+			Identify the type of job:
+			cron: job will have a schedule and will execute on schedule by the CurryCron script.
+			job: ordinary job (or queued job) without a schedule.
+		-->
+		<column name="type" type="ENUM" valueSet="cron, job" required="true" />
 		
 		<unique>
 			<unique-column name="job_class" size="127" />

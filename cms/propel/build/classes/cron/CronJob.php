@@ -72,8 +72,9 @@ class CronJob extends BaseCronJob
      * @param string $view  The view/method name from which this method is called.
      * @param string $jobHandler    The job handler method name.
      * @param null|Curry_From_SubForm $dataForm     Form to capture data that will be passed to the job handler at runtime.
+     * @param boolean $isScheduledJob    Whether the type of job is 'cron'?
      */
-    public static function handleJobScheduler($context, $view = null, $jobHandler = null, $dataForm = null)
+    public static function handleJobScheduler($context, $view = null, $jobHandler = null, $dataForm = null, $isScheduledJob = true)
     {
         $ctxRC = new ReflectionClass(get_class($context));
         $jobClass = $ctxRC->getName();
@@ -88,6 +89,7 @@ class CronJob extends BaseCronJob
         
         $form = new Curry_Form_ModelForm('CronJobSchedule', array(
             'elements' => array(
+                'type' => array('hidden', array('value' => $isScheduledJob ? 'cron' : 'job')),
                 'module_view' => array('hidden', array('value' => $view)),
                 'job_class' => array('hidden', array('value' => $jobClass)),
                 'job_handler' => array('text', array(
@@ -98,6 +100,7 @@ class CronJob extends BaseCronJob
                 )),
             ),
         ));
+        
         if ($dataForm instanceof Curry_Form_SubForm) {
             $form->addSubForm($dataForm, 'cronjob_data');
         }
@@ -120,6 +123,8 @@ class CronJob extends BaseCronJob
             if ($job) {
                 $form->fillForm($job->getCronJobSchedule());
                 $form->getElement('active')->setValue($job->getActive());
+                // type of job is populated based on the boolean param and not
+                // based on the value in the table so that it can be controlled by the calling function.
                 if ($dataForm instanceof Curry_Form_SubForm) {
                     self::fillDataForm($form->getSubForm('cronjob_data'), $job);
                 }
@@ -161,6 +166,7 @@ class CronJob extends BaseCronJob
             $job->setJobClass($values['job_class'])
                 ->setJobHandler($values['job_handler'])
                 ->setModuleView($values['module_view'])
+                ->setType($values['type'])
                 ->setActive($values['active']);
             if (isset($values['cronjob_data'])) {
                 $job->setData($values['cronjob_data']);
